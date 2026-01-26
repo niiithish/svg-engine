@@ -1,9 +1,10 @@
 "use client";
 
-import PromptBox from "./prompt-box";
+import PromptBox, { IconOptions } from "./prompt-box";
 import Image from "next/image";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { generateSvg } from "@/app/actions";
+import { useState, useTransition } from "react";
 
 const suggestions = [
     "User profile avatar",
@@ -14,11 +15,27 @@ const suggestions = [
     "Lightbulb for ideas",
 ];
 
+import { toast } from "sonner";
+
 const Sidebar = () => {
     const [promptValue, setPromptValue] = useState("");
+    const [options, setOptions] = useState<IconOptions>({ strokeWidth: 1.5, style: "stroke" });
+    const [isPending, startTransition] = useTransition();
 
     const handleSuggestionClick = (suggestion: string) => {
         setPromptValue(suggestion);
+    };
+
+    const handleSubmit = () => {
+        if (!promptValue.trim()) return;
+        startTransition(async () => {
+            const result = await generateSvg(promptValue, options);
+            if (result && !result.success) {
+                toast.error(result.message);
+            } else {
+                setPromptValue("");
+            }
+        });
     };
 
     return (
@@ -32,7 +49,14 @@ const Sidebar = () => {
                     Describe an icon, and let AI generate it for you
                 </p>
             </div>
-            <PromptBox value={promptValue} onChange={setPromptValue} />
+            <PromptBox
+                value={promptValue}
+                onChange={setPromptValue}
+                onSubmit={handleSubmit}
+                isLoading={isPending}
+                options={options}
+                onOptionsChange={setOptions}
+            />
             <div className="flex flex-col gap-2">
                 <h2 className="text-base font-semibold">Suggestions:</h2>
                 <div className="flex flex-wrap gap-2">
