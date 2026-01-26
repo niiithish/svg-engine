@@ -1,47 +1,54 @@
 "use client";
 
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupText,
+  InputGroupTextarea,
+} from "@/components/ui/input-group";
+import { Separator } from "@/components/ui/separator";
+import { Sparkles, ArrowUp02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
-const suggestions = [
-  "User profile avatar",
-  "Settings gear",
-  "Open book for documentation",
-  "Cloud upload arrow",
-  "Secure lock",
-  "Lightbulb for ideas",
-];
+interface PromptBoxProps {
+  value?: string;
+  onChange?: (value: string) => void;
+}
 
-const PromptBox = () => {
-  const [prompt, setPrompt] = useState("");
+const PromptBox = ({ value = "", onChange }: PromptBoxProps) => {
+  const [internalValue, setInternalValue] = useState(value);
+
+  const handleChange = (newValue: string) => {
+    setInternalValue(newValue);
+    onChange?.(newValue);
+  };
 
   return (
-    <div className="flex w-full flex-col gap-4">
-      <div className="flex gap-3">
-        <Input
-          placeholder="e.g., 'A rocket ship launching'"
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
+    <div className="flex w-full max-w-2xl flex-col gap-4">
+      <InputGroup className="bg-background">
+        <InputGroupTextarea
+          placeholder="Ask me anything..."
+          value={value || internalValue}
+          onChange={(e) => handleChange(e.target.value)}
         />
-        <Button variant="default">Generate Icon</Button>
-      </div>
-
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-muted-foreground">Suggestions:</p>
-        <div className="flex flex-wrap gap-2">
-          {suggestions.map((suggestion) => (
-            <Button
-              key={suggestion}
-              variant="outline"
-              size="sm"
-              onClick={() => setPrompt(suggestion)}
-            >
-              {suggestion}
-            </Button>
-          ))}
-        </div>
-      </div>
+        <InputGroupAddon align="block-end">
+          <InputGroupButton size="icon-xs" variant="ghost">
+            <HugeiconsIcon icon={Sparkles} />
+          </InputGroupButton>
+          <InputGroupText className="ml-auto">0/3</InputGroupText>
+          <Separator className="h-4" orientation="vertical" />
+          <InputGroupButton
+            className="rounded-full"
+            size="icon-xs"
+            variant="default"
+          >
+            <HugeiconsIcon icon={ArrowUp02Icon} />
+            <span className="sr-only">Send</span>
+          </InputGroupButton>
+        </InputGroupAddon>
+      </InputGroup>
     </div>
   );
 };
