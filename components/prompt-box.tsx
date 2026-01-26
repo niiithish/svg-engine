@@ -8,7 +8,7 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
-import { Sparkles, ArrowUp02Icon } from "@hugeicons/core-free-icons";
+import { ArrowUp02Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 
@@ -35,7 +35,7 @@ const PromptBox = ({ value = "", onChange }: PromptBoxProps) => {
         />
         <InputGroupAddon align="block-end">
           <InputGroupButton size="icon-xs" variant="ghost">
-            <HugeiconsIcon icon={Sparkles} />
+            <HugeiconsIcon icon={PlusSignIcon} />
           </InputGroupButton>
           <InputGroupText className="ml-auto">0/3</InputGroupText>
           <Separator className="h-4" orientation="vertical" />

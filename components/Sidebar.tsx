@@ -28,13 +28,13 @@ const Sidebar = () => {
                     <Image src="/logo.svg" alt="Logo" width={24} height={24} />
                     SVG Engine
                 </h1>
-                <p className="text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                     Describe an icon, and let AI generate it for you
                 </p>
             </div>
             <PromptBox value={promptValue} onChange={setPromptValue} />
             <div className="flex flex-col gap-2">
-                <h2 className="text-lg font-semibold">Suggestions:</h2>
+                <h2 className="text-base font-semibold">Suggestions:</h2>
                 <div className="flex flex-wrap gap-2">
                     {suggestions.map((suggestion, index) => (
                         <Button
