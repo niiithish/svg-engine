@@ -8,6 +8,7 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { ArrowUp02Icon, PlusSignIcon, Settings01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
@@ -33,11 +34,16 @@ interface PromptBoxProps {
   onOptionsChange?: (options: IconOptions) => void;
 }
 
-const PromptBox = ({ value = "", onChange, onSubmit, isLoading, options, onOptionsChange }: PromptBoxProps) => {
-  const [internalValue, setInternalValue] = useState(value);
+const PromptBox = ({ value, onChange, onSubmit, isLoading, options, onOptionsChange }: PromptBoxProps) => {
+  const [internalValue, setInternalValue] = useState("");
+
+  const isControlled = value !== undefined;
+  const inputValue = isControlled ? value : internalValue;
 
   const handleChange = (newValue: string) => {
-    setInternalValue(newValue);
+    if (!isControlled) {
+      setInternalValue(newValue);
+    }
     onChange?.(newValue);
   };
 
@@ -53,7 +59,7 @@ const PromptBox = ({ value = "", onChange, onSubmit, isLoading, options, onOptio
       <InputGroup className="bg-background">
         <InputGroupTextarea
           placeholder="Ask me anything..."
-          value={value || internalValue}
+          value={inputValue}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={handleKeyDown}
           readOnly={isLoading}
@@ -91,13 +97,13 @@ const PromptBox = ({ value = "", onChange, onSubmit, isLoading, options, onOptio
                   </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="stroke-width">Stroke Width: {options?.strokeWidth || 1.5}px</Label>
+                  <Label htmlFor="stroke-width">Stroke Width: {options?.strokeWidth || 1}px</Label>
                   <Slider
                     id="stroke-width"
                     min={0.5}
                     max={5}
                     step={0.1}
-                    value={[options?.strokeWidth || 1.5]}
+                    value={[options?.strokeWidth || 1]}
                     onValueChange={(val) => {
                       const newVal = Array.isArray(val) ? val[0] : val;
                       onOptionsChange?.({ ...options, strokeWidth: newVal });
@@ -112,7 +118,7 @@ const PromptBox = ({ value = "", onChange, onSubmit, isLoading, options, onOptio
                       </div>
                       <input
                         type="color"
-                        value={options?.color && options.color !== "currentColor" ? options.color : "#000000"}
+                        value={options?.color && options.color !== "currentColor" ? options.color : "#ffffff"}
                         onChange={(e) => onOptionsChange?.({ ...options, color: e.target.value })}
                         className="h-10 w-10 cursor-pointer rounded-md border border-input p-1"
                       />
@@ -139,7 +145,7 @@ const PromptBox = ({ value = "", onChange, onSubmit, isLoading, options, onOptio
             disabled={isLoading}
           >
             {isLoading ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              <Spinner />
             ) : (
               <HugeiconsIcon icon={ArrowUp02Icon} />
             )}

@@ -17,8 +17,6 @@ export async function generateSvg(prompt: string, options?: { strokeWidth?: numb
     }
 
     try {
-        console.log("Generating SVG with prompt:", prompt);
-        console.log("Using model: gemini-3-flash-preview");
 
         const { text: svgContent } = await generateText({
             model: google("gemini-3-flash-preview"),
