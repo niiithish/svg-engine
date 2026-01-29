@@ -1,12 +1,9 @@
 import { AppSidebar } from "@/components/main-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Copy02Icon, Download01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { db } from "@/index";
 import { iconsTable } from "@/db/schema";
 import { desc } from "drizzle-orm";
+import { IconCard } from "@/components/icon-card";
 
 export default async function Page() {
     const icons = await db.select().from(iconsTable).orderBy(desc(iconsTable.createdAt));
@@ -24,28 +21,7 @@ export default async function Page() {
                             <p className="text-sm">No icons found</p>
                         ) : (
                             icons.map((icon) => (
-                                icon.svg.length > 0 && <Card key={icon.id}>
-                                    <CardContent className="flex items-center justify-center p-8">
-                                        <div
-                                            className="h-24 w-24 [&_svg]:size-full"
-                                            dangerouslySetInnerHTML={{ __html: icon.svg }}
-                                        />
-                                    </CardContent>
-                                    <CardFooter className="flex flex-row items-center justify-center gap-2">
-                                        <Button variant="outline" className="flex-1 group">
-                                            <span className="w-0 overflow-hidden opacity-0 group-hover:w-5 group-hover:opacity-100 group-hover: transition-all duration-300 ease-in-out">
-                                                <HugeiconsIcon icon={Copy02Icon} />
-                                            </span>
-                                            Copy
-                                        </Button>
-                                        <Button className="flex-1 group">
-                                            <span className="w-0 overflow-hidden opacity-0 group-hover:w-5 group-hover:opacity-100 group-hover: transition-all duration-300 ease-in-out">
-                                                <HugeiconsIcon icon={Download01Icon} />
-                                            </span>
-                                            Download
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
+                                icon.svg.length > 0 && <IconCard key={icon.id} svg={icon.svg} id={icon.id} />
                             )))}
                     </div>
                 </div>

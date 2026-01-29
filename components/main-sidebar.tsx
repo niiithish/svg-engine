@@ -54,7 +54,7 @@ export function AppSidebar() {
                     <span className="text-xl font-bold">SVG Engine</span>
                 </div>
             </SidebarHeader>
-            <SidebarSeparator />
+            {/* <SidebarSeparator /> */}
             <SidebarContent className="p-4 gap-6">
                 <div className="flex flex-col gap-2">
                     <p className="text-sm text-muted-foreground">
