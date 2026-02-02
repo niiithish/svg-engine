@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { ArrowUp02Icon, PlusSignIcon, Settings01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -34,11 +34,31 @@ interface PromptBoxProps {
   onOptionsChange?: (options: IconOptions) => void;
 }
 
+const RATE_LIMIT_SECONDS = 60;
+
 const PromptBox = ({ value, onChange, onSubmit, isLoading, options, onOptionsChange }: PromptBoxProps) => {
   const [internalValue, setInternalValue] = useState("");
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
 
   const isControlled = value !== undefined;
   const inputValue = isControlled ? value : internalValue;
+  const isOnCooldown = cooldownRemaining > 0;
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+
+    const timer = setInterval(() => {
+      setCooldownRemaining((prev) => {
+        if (prev <= 1) {
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldownRemaining]);
 
   const handleChange = (newValue: string) => {
     if (!isControlled) {
@@ -47,15 +67,25 @@ const PromptBox = ({ value, onChange, onSubmit, isLoading, options, onOptionsCha
     onChange?.(newValue);
   };
 
+  const handleSubmit = useCallback(() => {
+    if (isOnCooldown || isLoading) return;
+
+    // Start the cooldown
+    setCooldownRemaining(RATE_LIMIT_SECONDS);
+
+    // Call the original onSubmit
+    onSubmit?.();
+  }, [isOnCooldown, isLoading, onSubmit]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      onSubmit?.();
+      handleSubmit();
     }
   };
 
   return (
-    <div className="flex w-full max-w-2xl flex-col gap-4">
+    <div className="flex w-full max-w-2xl flex-col gap-2">
       <InputGroup className="bg-background">
         <InputGroupTextarea
           placeholder="Ask me anything..."
@@ -141,8 +171,8 @@ const PromptBox = ({ value, onChange, onSubmit, isLoading, options, onOptionsCha
             className="rounded-full"
             size="icon-xs"
             variant="default"
-            onClick={onSubmit}
-            disabled={isLoading}
+            onClick={handleSubmit}
+            disabled={isLoading || isOnCooldown}
           >
             {isLoading ? (
               <Spinner />
@@ -153,8 +183,18 @@ const PromptBox = ({ value, onChange, onSubmit, isLoading, options, onOptionsCha
           </InputGroupButton>
         </InputGroupAddon>
       </InputGroup>
+      <p className="text-xs text-muted-foreground text-center">
+        {isOnCooldown ? (
+          <span className="text-amber-500">
+            Please wait {cooldownRemaining}s before next request
+          </span>
+        ) : (
+          "Only 1 request per minute"
+        )}
+      </p>
     </div>
   );
 };
 
 export default PromptBox;
+
